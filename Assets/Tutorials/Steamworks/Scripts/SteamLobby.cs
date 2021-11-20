@@ -3,90 +3,92 @@ using Steamworks;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace DapperDino.Mirror.Tutorials.Steamworks
+/// <summary>
+/// Handles creating and connecting to a steam lobby.
+/// </summary>
+public class SteamLobby : MonoBehaviour
 {
-    public class SteamLobby : MonoBehaviour
+  [SerializeField] private GameObject buttons = null;
+  [SerializeField] private Text debugText;
+  [SerializeField] private GameManager gameManager;
+
+  protected Callback<LobbyCreated_t> lobbyCreated;
+  protected Callback<GameLobbyJoinRequested_t> gameLobbyJoinRequested;
+  protected Callback<LobbyEnter_t> lobbyEntered;
+
+  private const string HostAddressKey = "HostAddress";
+
+  private NetworkManager networkManager;
+
+  private void Start()
+  {
+    debugText.text += "\nSteamLobby.Start()";
+    networkManager = GetComponent<NetworkManager>();
+
+    if (!SteamManager.Initialized) { return; }
+
+    lobbyCreated = Callback<LobbyCreated_t>.Create(OnLobbyCreated);
+    gameLobbyJoinRequested = Callback<GameLobbyJoinRequested_t>.Create(OnGameLobbyJoinRequested);
+    lobbyEntered = Callback<LobbyEnter_t>.Create(OnLobbyEntered);
+  }
+
+  public void HostLobby()
+  {
+    debugText.text += "\nSteamLobby.HostLobby()";
+    buttons.SetActive(false);
+    GameManager.EnableNormalGameplay();
+
+    SteamMatchmaking.CreateLobby(ELobbyType.k_ELobbyTypeFriendsOnly, networkManager.maxConnections);
+  }
+
+  private void OnLobbyCreated(LobbyCreated_t callback)
+  {
+    debugText.text += "\nSteamLobby.OnLobbyCreated()";
+    if (callback.m_eResult != EResult.k_EResultOK)
     {
-        [SerializeField] private GameObject buttons = null;
-    [SerializeField] private Text debugText;
+      buttons.SetActive(true);
+      return;
+    }
 
-        protected Callback<LobbyCreated_t> lobbyCreated;
-        protected Callback<GameLobbyJoinRequested_t> gameLobbyJoinRequested;
-        protected Callback<LobbyEnter_t> lobbyEntered;
+    networkManager.StartHost();
 
-        private const string HostAddressKey = "HostAddress";
+    SteamMatchmaking.SetLobbyData(
+        new CSteamID(callback.m_ulSteamIDLobby),
+        HostAddressKey,
+        SteamUser.GetSteamID().ToString());
+  }
 
-        private NetworkManager networkManager;
+  private void OnGameLobbyJoinRequested(GameLobbyJoinRequested_t callback)
+  {
+    debugText.text += "\nSteamLobby.OnGameLobbyJoinRequested()";
 
-        private void Start()
-        {
-      debugText.text += "\nSteamLobby.Start()";
-            networkManager = GetComponent<NetworkManager>();
+    SteamMatchmaking.JoinLobby(callback.m_steamIDLobby);
+  }
 
-            if (!SteamManager.Initialized) { return; }
+  private void OnLobbyEntered(LobbyEnter_t callback)
+  {
+    debugText.text += "\nSteamLobby.OnLobbyEntered()";
 
-            lobbyCreated = Callback<LobbyCreated_t>.Create(OnLobbyCreated);
-            gameLobbyJoinRequested = Callback<GameLobbyJoinRequested_t>.Create(OnGameLobbyJoinRequested);
-            lobbyEntered = Callback<LobbyEnter_t>.Create(OnLobbyEntered);
-        }
-
-        public void HostLobby()
-        {
-      debugText.text += "\nSteamLobby.HostLobby()";
-      buttons.SetActive(false);
-
-            SteamMatchmaking.CreateLobby(ELobbyType.k_ELobbyTypeFriendsOnly, networkManager.maxConnections);
-        }
-
-        private void OnLobbyCreated(LobbyCreated_t callback)
-        {
-      debugText.text += "\nSteamLobby.OnLobbyCreated()";
-      if (callback.m_eResult != EResult.k_EResultOK)
-            {
-                buttons.SetActive(true);
-                return;
-            }
-
-            networkManager.StartHost();
-
-            SteamMatchmaking.SetLobbyData(
-                new CSteamID(callback.m_ulSteamIDLobby),
-                HostAddressKey,
-                SteamUser.GetSteamID().ToString());
-        }
-
-        private void OnGameLobbyJoinRequested(GameLobbyJoinRequested_t callback)
+    if (NetworkServer.active)
     {
-      debugText.text += "\nSteamLobby.OnGameLobbyJoinRequested()";
-
-      SteamMatchmaking.JoinLobby(callback.m_steamIDLobby);
-        }
-
-        private void OnLobbyEntered(LobbyEnter_t callback)
-    {
-      debugText.text += "\nSteamLobby.OnLobbyEntered()";
-
-      if (NetworkServer.active)
-      {
-        debugText.text += "\nJoined as host";
-        return; 
-      }
+      debugText.text += "\nJoined as host";
+      return; 
+    }
     else
-        debugText.text += "\nJoined as client";
+      debugText.text += "\nJoined as client";
 
-      string hostAddress = SteamMatchmaking.GetLobbyData(
-                new CSteamID(callback.m_ulSteamIDLobby),
-                HostAddressKey);
-      debugText.text += "\nGot host address from lobby data: " + hostAddress;
+    string hostAddress = SteamMatchmaking.GetLobbyData(
+        new CSteamID(callback.m_ulSteamIDLobby),
+        HostAddressKey);
+    debugText.text += "\nGot host address from lobby data: " + hostAddress;
 
-      networkManager.networkAddress = hostAddress;
+    networkManager.networkAddress = hostAddress;
 
-      debugText.text += "\nStarting client...";
-      networkManager.StartClient();
+    debugText.text += "\nStarting client...";
+    networkManager.StartClient();
 
-            buttons.SetActive(false);
+    buttons.SetActive(false);
 
-      debugText.text += "\nReady?";
-    }
-    }
+    debugText.text += "\nReady?";
+  }
 }

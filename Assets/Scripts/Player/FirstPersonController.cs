@@ -7,6 +7,9 @@
 using Mirror;
 using UnityEngine;
 
+/// <summary>
+/// Handles first person movement.
+/// </summary>
 public class FirstPersonController : NetworkBehaviour
 {
   public float speed = 10f;
@@ -120,14 +123,6 @@ public class FirstPersonController : NetworkBehaviour
     if (Input.GetKey(KeyCode.D))
     {
       direction += Vector3.right;
-    }
-    if (Input.GetKey(KeyCode.Q))
-    {
-      direction += Vector3.down;
-    }
-    if (Input.GetKey(KeyCode.E))
-    {
-      direction += Vector3.up;
     }
     return direction;
   }

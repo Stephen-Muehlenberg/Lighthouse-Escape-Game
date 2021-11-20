@@ -15,13 +15,10 @@ public class AreaTrigger : NetworkBehaviour
   [ServerCallback]
   void OnTriggerEnter(Collider co)
   {
-    UnityEngine.Debug.Log("ArearTrigger.OnTriggerEnter()");
     if (!isServer) return;
-    UnityEngine.Debug.Log("- AAA - player tag : " + co.tag);
 
     if (co.CompareTag("Player"))
     {
-      UnityEngine.Debug.Log("on enetered - authority ? " + hasAuthority + ", server ? " + isServer);
       playersInArea++;
       onPlayerEntered?.Invoke(this, co.gameObject);
     }
@@ -34,7 +31,6 @@ public class AreaTrigger : NetworkBehaviour
 
     if (co.CompareTag("Player"))
     {
-      UnityEngine.Debug.Log("on exited - authority ? " + hasAuthority + ", server ? " + isServer);
       playersInArea--;
       onPlayerExited?.Invoke(this, co.gameObject);
     }
