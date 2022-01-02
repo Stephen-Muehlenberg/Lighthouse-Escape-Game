@@ -3,13 +3,13 @@ An online co-op escape room demo, intended to be a free, open source framework f
 
 ## About
 
-This project uses the open source [**Mirror Networking**](https://mirror-networking.com/) framework to handle network connection, [**Steamworks**](https://partner.steamgames.com/) to allow you to invite friends, and [**FizzySteamworks**](https://github.com/Chykary/FizzySteamworks) as the network transport connecting them.
+This project uses the open source [**Mirror Networking**](https://mirror-networking.com/) framework to handle network connection, [**Steamworks**](https://partner.steamgames.com/) to allow you to invite friends, and [**FizzySteamworks**](https://github.com/Chykary/FizzySteamworks) as the network transport between them.
 
 ## Build
 
-Latest build can be found [here](). **Requires a Steam account to play.**
+Latest Windows build can be found [here](https://github.com/Stephen-Muehlenberg/Lighthouse-Escape-Game/blob/master/Latest%20Build/Lighthouse%20Escape%20Room%20v0.2.0.7z). **Requires a Steam account for network functionality.**
 
-This build allows you to create a game and invite friends. With the game, you can see each other moving around, and can trigger basic switches. No significant gameplay content has been added yet.
+This build allows you to create a game and invite a friend through Steam. With the game, you can see each other moving around, and can trigger basic switches. No significant gameplay content has been added yet.
 
 ## Project Status
 |Feature|Status|
